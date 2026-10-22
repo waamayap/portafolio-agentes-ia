@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Agente de Órdenes de Compra SAP</title>
+    <link rel="stylesheet" href="estilos.css" />
+  </head>
+  <body>
+    <header class="barra">
+      <div>
+        <h1>Agente de Órdenes de Compra SAP</h1>
+        <p class="sub">Lee el paquete, valida RC1–RC10, arma la OC y la crea en un SAP simulado</p>
+      </div>
+      <div class="barra-acciones">
+        <span id="proveedor" class="insignia">conectando…</span>
+        <button id="nueva" class="boton-sec" type="button">Nueva sesión</button>
+      </div>
+    </header>
+
+    <main class="disposicion">
+      <aside class="lateral">
+        <h2>Casos de prueba</h2>
+        <div id="casos" class="casos"></div>
+        <h2>Ejemplos</h2>
+        <button class="ejemplo" type="button" data-texto='Procesa la solicitud "sol-004". Muéstrame la OC como quedaría en SAP, qué validaciones pasó y cuáles no, y no la crees hasta que yo lo confirme.'>
+          sol-004 sin crear hasta confirmar
+        </button>
+        <button class="ejemplo" type="button" data-texto="¿Qué solicitudes hay pendientes?">Listar solicitudes</button>
+        <button class="ejemplo" type="button" data-texto="Procesa la solicitud sol-001 otra vez">Idempotencia (sol-001 de nuevo)</button>
+      </aside>
+
+      <section class="chat">
+        <div id="mensajes" class="mensajes" aria-live="polite">
+          <div class="vacio">
+            <p>Pídele al agente que procese una solicitud, por ejemplo <em>"Procesa la solicitud sol-001"</em>.</p>
+            <p>Verás cada herramienta que llama y, cuando haya excepciones, te pedirá confirmación antes de crear la OC.</p>
+          </div>
+        </div>
+
+        <div id="confirmacion" class="confirmacion" hidden>
+          <span>⚠️ El agente espera tu confirmación</span>
+          <div>
+            <button id="si" class="boton" type="button">Confirmo</button>
+            <button id="no" class="boton-sec" type="button">No, no la crees</button>
+          </div>
+        </div>
+
+        <form id="formulario" class="entrada">
+          <textarea id="texto" rows="2" maxlength="2000" placeholder="Escribe tu mensaje… (Enter envía, Shift+Enter nueva línea)" required></textarea>
+          <button id="enviar" class="boton" type="submit">Enviar</button>
+        </form>
+      </section>
+    </main>
+
+    <script src="markdown.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>

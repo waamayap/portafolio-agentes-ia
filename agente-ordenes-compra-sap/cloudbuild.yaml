@@ -1,0 +1,29 @@
+# Construye la imagen, la sube a Artifact Registry y la despliega en Cloud Run.
+#   gcloud builds submit --config cloudbuild.yaml
+substitutions:
+  _REGION: us-central1
+  _REPO: agente-ordenes-compra-sap
+  _SERVICIO: agente-ordenes-compra-sap
+  _IMAGEN: ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/${_SERVICIO}:latest
+
+steps:
+  - name: gcr.io/cloud-builders/docker
+    args: ["build", "-t", "${_IMAGEN}", "."]
+  - name: gcr.io/cloud-builders/docker
+    args: ["push", "${_IMAGEN}"]
+  - name: gcr.io/google.com/cloudsdktool/cloud-sdk
+    entrypoint: gcloud
+    args:
+      - run
+      - deploy
+      - ${_SERVICIO}
+      - --image=${_IMAGEN}
+      - --region=${_REGION}
+      - --allow-unauthenticated
+      - --max-instances=1
+      - --memory=512Mi
+      - --set-env-vars=LLM_PROVIDER=gemini,GEMINI_MODEL=gemini-3.8-flash,MAX_ITERACIONES=25,MAX_TOKENS_SESION=1000000
+      - --set-secrets=GEMINI_API_KEY=gemini-api-key:latest
+
+images:
+  - ${_IMAGEN}
