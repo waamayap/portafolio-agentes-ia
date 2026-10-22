@@ -1,0 +1,10 @@
+# Lo que NO se sube a Cloud Build (gcloud builds submit)
+.git
+.gitignore
+.gcloudignore
+node_modules/
+out/
+.env
+.env.*
+!.env.example
+*.log

@@ -1,10 +1,15 @@
 # Construye la imagen, la sube a Artifact Registry y la despliega en Cloud Run.
 #   gcloud builds submit --config cloudbuild.yaml
+# La clave de OpenAI vive en Secret Manager (secreto "openai-api-key"); nunca en la imagen ni en este archivo.
 substitutions:
   _REGION: us-central1
   _REPO: agente-ordenes-compra-sap
   _SERVICIO: agente-ordenes-compra-sap
-  _IMAGEN: ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/${_SERVICIO}:latest
+  _IMAGEN: ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/${_SERVICIO}:${BUILD_ID}
+
+options:
+  dynamicSubstitutions: true
+  logging: CLOUD_LOGGING_ONLY
 
 steps:
   - name: gcr.io/cloud-builders/docker
@@ -20,10 +25,12 @@ steps:
       - --image=${_IMAGEN}
       - --region=${_REGION}
       - --allow-unauthenticated
+      # Sesiones en memoria + archivo local: una sola instancia mantiene la conversación coherente.
       - --max-instances=1
       - --memory=512Mi
-      - --set-env-vars=LLM_PROVIDER=gemini,GEMINI_MODEL=gemini-3.8-flash,MAX_ITERACIONES=25,MAX_TOKENS_SESION=1000000
-      - --set-secrets=GEMINI_API_KEY=gemini-api-key:latest
+      - --timeout=300
+      - --set-env-vars=LLM_PROVIDER=openai,OPENAI_MODEL=gpt-5.4-mini,OPENAI_REASONING=none,MAX_ITERACIONES=25,MAX_TOKENS_SESION=1000000,LLM_TIMEOUT_MS=60000
+      - --set-secrets=OPENAI_API_KEY=openai-api-key:latest
 
 images:
   - ${_IMAGEN}
